@@ -137,7 +137,7 @@ void GLWidget::initializeGL()
     program1.addShader(vshader1);
     program1.addShader(fshader1);
     program1.link();
-    vertexAttr1 = glGetAttribLocation(program1, "coord2d");
+    vertexAttr1 = program1.attributeLocation( "coord2d");
 
     // Create the vertex buffer.
     vertices.clear();
