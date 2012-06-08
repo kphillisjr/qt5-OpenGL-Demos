@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Name=OpenGL 3 Demo - 03 Rotating Triangle
+Exec=/opt/usr/bin/03-rotating-triangle
+Icon=hellogl
+X-Window-Icon=
+X-HildonDesk-ShowInToolbar=true
+X-Osso-Type=application/x-executable

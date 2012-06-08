@@ -38,70 +38,36 @@
 **
 ****************************************************************************/
 
-#include <QtWidgets>
+#ifndef WINDOW_H
+#define WINDOW_H
+
+#include <QWidget>
 #include <QLabel>
-#include "glwidget.h"
-#include "window.h"
 
+QT_BEGIN_NAMESPACE
+class QSlider;
+QT_END_NAMESPACE
 //! [0]
-Window::Window()
-{
-    glWidget = new GLWidget;
-    QGLFormat base_format = glWidget->format();
-    // Remove Deprecated Functions.
-    base_format.setProfile(QGLFormat::CoreProfile);
-    glWidget->setFormat(base_format);
+class GLWidget;
 
-    // Connect the signal for the boolean click.
-    //connect(glWidget, SIGNAL(forgotToBindChanged(bool)), glWidget, SLOT(forgotToBind(bool)));
+class Window : public QWidget
+{
+    Q_OBJECT
+
+public:
+    Window();
+
+protected:
+    void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+
+private:
+	void UpdateLabel();
+    GLWidget *glWidget;
+    QLabel   *glShaderStatus;
+
+    bool ForgotShaderBind;
+};
 //! [0]
-	glShaderStatus = new QLabel;
 
-//! [1]
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(glWidget);
-    mainLayout->addWidget(glShaderStatus);
-    setLayout(mainLayout);
-
-    setWindowTitle(tr("OpenGL 3.x - Rotating Triangle"));
-    // Make Sure the Default value for shader is enabled.
-    ForgotShaderBind = false;    
-    glWidget->forgotToBindShader(ForgotShaderBind);
-    UpdateLabel();
-}
-//! [1]
-void Window::UpdateLabel()
-{
-	if(glShaderStatus)
-	{
-		if(ForgotShaderBind)
-			glShaderStatus->setText("Shader Is Currently Not Set.");
-		else
-			glShaderStatus->setText("You Remembered to Set the Shader.");
-	}
-}
-void Window::mousePressEvent(QMouseEvent *event)
-{
- 	if(event->type () & QEvent::MouseButtonPress){
-		if (event->buttons() & Qt::RightButton) {
-			ForgotShaderBind=!ForgotShaderBind;
-		    glWidget->forgotToBindShader(ForgotShaderBind);
-	        UpdateLabel();
-		    return;
-    	}
-    }
-	    QWidget::mousePressEvent(event);	
-}
-
-void Window::keyPressEvent(QKeyEvent *e)
-{
-    if (e->key() == Qt::Key_Escape) {
-        close();
-    } else if (e->key() == Qt::Key_Space) {
-	    ForgotShaderBind=!ForgotShaderBind;
-        glWidget->forgotToBindShader(ForgotShaderBind);
-        UpdateLabel();
-    } else {
-        QWidget::keyPressEvent(e);
-    }
-}
+#endif

@@ -38,70 +38,68 @@
 **
 ****************************************************************************/
 
-#include <QtWidgets>
-#include <QLabel>
-#include "glwidget.h"
-#include "window.h"
+#ifndef GLWIDGET_H
+#define GLWIDGET_H
+
+#include <QGLWidget>
+#include <QGLBuffer>
+#include <QtOpenGL/qglshaderprogram.h>
+
+class QtLogo;
 
 //! [0]
-Window::Window()
+class GLWidget : public QGLWidget
 {
-    glWidget = new GLWidget;
-    QGLFormat base_format = glWidget->format();
-    // Remove Deprecated Functions.
-    base_format.setProfile(QGLFormat::CoreProfile);
-    glWidget->setFormat(base_format);
+    Q_OBJECT
 
-    // Connect the signal for the boolean click.
-    //connect(glWidget, SIGNAL(forgotToBindChanged(bool)), glWidget, SLOT(forgotToBind(bool)));
+public:
+    GLWidget(QWidget *parent = 0);
+    ~GLWidget();
+
+    QSize minimumSizeHint() const;
+    QSize sizeHint() const;
 //! [0]
-	glShaderStatus = new QLabel;
-
+	void resetRotationMatrix();
 //! [1]
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(glWidget);
-    mainLayout->addWidget(glShaderStatus);
-    setLayout(mainLayout);
-
-    setWindowTitle(tr("OpenGL 3.x - Rotating Triangle"));
-    // Make Sure the Default value for shader is enabled.
-    ForgotShaderBind = false;    
-    glWidget->forgotToBindShader(ForgotShaderBind);
-    UpdateLabel();
-}
+public slots:
+    void setXRotation(int angle);
+    void setYRotation(int angle);
+    void forgotToBindShader(bool);
+signals:
+    void xRotationChanged(int angle);
+    void yRotationChanged(int angle);
+    void forgotToBindShaderChanged(bool);
 //! [1]
-void Window::UpdateLabel()
-{
-	if(glShaderStatus)
-	{
-		if(ForgotShaderBind)
-			glShaderStatus->setText("Shader Is Currently Not Set.");
-		else
-			glShaderStatus->setText("You Remembered to Set the Shader.");
-	}
-}
-void Window::mousePressEvent(QMouseEvent *event)
-{
- 	if(event->type () & QEvent::MouseButtonPress){
-		if (event->buttons() & Qt::RightButton) {
-			ForgotShaderBind=!ForgotShaderBind;
-		    glWidget->forgotToBindShader(ForgotShaderBind);
-	        UpdateLabel();
-		    return;
-    	}
-    }
-	    QWidget::mousePressEvent(event);	
-}
 
-void Window::keyPressEvent(QKeyEvent *e)
-{
-    if (e->key() == Qt::Key_Escape) {
-        close();
-    } else if (e->key() == Qt::Key_Space) {
-	    ForgotShaderBind=!ForgotShaderBind;
-        glWidget->forgotToBindShader(ForgotShaderBind);
-        UpdateLabel();
-    } else {
-        QWidget::keyPressEvent(e);
-    }
-}
+//! [2]
+protected:
+    void initializeGL();
+    void paintGL();
+    void resizeGL(int width, int height);
+    void mouseMoveEvent(QMouseEvent *event);
+//! [2]
+
+//! [3]
+private:
+	bool mforgotToBindShader;
+	bool oldForgotToBindShader;
+    QColor qtGreen;
+    QColor qtPurple;
+    QPoint lastPos;
+    QVector<QVector2D> vertices;
+    QVector<GLushort> indices;
+    QMatrix4x4 RotationMatrix;
+	QGLShaderProgram program1;
+    int vertexAttr1;
+    int matrixUniform1;
+    int xRot;
+    int yRot;
+    
+    QGLBuffer *qtIndexBuffer;
+    QGLBuffer *qtVertexBuffer;
+    
+};
+//! [3]
+
+#endif
+

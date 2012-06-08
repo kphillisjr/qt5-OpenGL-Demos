@@ -38,70 +38,37 @@
 **
 ****************************************************************************/
 
-#include <QtWidgets>
-#include <QLabel>
-#include "glwidget.h"
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QtWidgets/QMessageBox>
+#include <QtOpenGL/QGLPixelBuffer>
+
 #include "window.h"
 
-//! [0]
-Window::Window()
+int main(int argc, char *argv[])
 {
-    glWidget = new GLWidget;
-    QGLFormat base_format = glWidget->format();
-    // Remove Deprecated Functions.
-    base_format.setProfile(QGLFormat::CoreProfile);
-    glWidget->setFormat(base_format);
-
-    // Connect the signal for the boolean click.
-    //connect(glWidget, SIGNAL(forgotToBindChanged(bool)), glWidget, SLOT(forgotToBind(bool)));
-//! [0]
-	glShaderStatus = new QLabel;
-
-//! [1]
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(glWidget);
-    mainLayout->addWidget(glShaderStatus);
-    setLayout(mainLayout);
-
-    setWindowTitle(tr("OpenGL 3.x - Rotating Triangle"));
-    // Make Sure the Default value for shader is enabled.
-    ForgotShaderBind = false;    
-    glWidget->forgotToBindShader(ForgotShaderBind);
-    UpdateLabel();
-}
-//! [1]
-void Window::UpdateLabel()
-{
-	if(glShaderStatus)
-	{
-		if(ForgotShaderBind)
-			glShaderStatus->setText("Shader Is Currently Not Set.");
-		else
-			glShaderStatus->setText("You Remembered to Set the Shader.");
-	}
-}
-void Window::mousePressEvent(QMouseEvent *event)
-{
- 	if(event->type () & QEvent::MouseButtonPress){
-		if (event->buttons() & Qt::RightButton) {
-			ForgotShaderBind=!ForgotShaderBind;
-		    glWidget->forgotToBindShader(ForgotShaderBind);
-	        UpdateLabel();
-		    return;
-    	}
+    QApplication app(argc, argv);
+    /* Test for Basic OpenGL Support */
+    if (!QGLFormat::hasOpenGL()) {
+		QMessageBox::information(0, "OpenGL 3.x Context Example",
+				 "This system does not support OpenGL.");
+        return -1;
     }
-	    QWidget::mousePressEvent(event);	
-}
-
-void Window::keyPressEvent(QKeyEvent *e)
-{
-    if (e->key() == Qt::Key_Escape) {
-        close();
-    } else if (e->key() == Qt::Key_Space) {
-	    ForgotShaderBind=!ForgotShaderBind;
-        glWidget->forgotToBindShader(ForgotShaderBind);
-        UpdateLabel();
-    } else {
-        QWidget::keyPressEvent(e);
+    /* Fail if you do not have OpenGL 3.0 or higher driver */
+    if(QGLFormat::openGLVersionFlags() < QGLFormat::OpenGL_Version_3_0)
+    {
+		QMessageBox::information(0, "OpenGL 3.x Context Example",
+				 "This system does not support OpenGL 3.x Contexts");
+        return -2;
     }
+    Window window;
+    window.resize(window.sizeHint());
+    int desktopArea = QApplication::desktop()->width() *
+                     QApplication::desktop()->height();
+    int widgetArea = window.width() * window.height();
+    if (((float)widgetArea / (float)desktopArea) < 0.75f)
+        window.show();
+    else
+        window.showMaximized();
+    return app.exec();
 }

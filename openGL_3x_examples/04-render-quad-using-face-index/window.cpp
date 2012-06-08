@@ -63,7 +63,7 @@ Window::Window()
     mainLayout->addWidget(glShaderStatus);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("OpenGL 3.x - Rotating Triangle"));
+    setWindowTitle(tr("OpenGL 3.x - Rendering Quads using Indices"));
     // Make Sure the Default value for shader is enabled.
     ForgotShaderBind = false;    
     glWidget->forgotToBindShader(ForgotShaderBind);
